@@ -1,0 +1,253 @@
+---
+import Base from '../layouts/Base.astro';
+import Board from './Board.astro';
+import Icon from './Icon.astro';
+import Piece from './Piece.astro';
+import { site } from '../site';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+const { lang = 'es' } = Astro.props;
+
+const gamesEs = [
+  {
+    name: 'Ajedrez',
+    rulebook: 'Leyes del Ajedrez de la FIDE',
+    points: ['Enroque, captura al paso y coronación', 'Tablas por repetición, 50 y 75 jugadas', 'Reloj con incremento'],
+  },
+  {
+    name: 'Damas',
+    rulebook: 'Internacional (FMJD), inglesa (WCDF) y española',
+    points: ['Captura obligatoria según cada variante', 'Dama larga o corta', 'Aviso cuando debes capturar'],
+  },
+  {
+    name: 'Damas chinas',
+    rulebook: 'Reglamento estándar',
+    points: ['Tablero de estrella de 121 casillas', 'De 2 a 6 jugadores', 'Saltos encadenados'],
+  },
+];
+
+const modesEs = [
+  { icon: 'ai', title: 'Contra la IA', body: 'Cinco niveles, del principiante al que piensa hasta tres segundos por jugada. Con pistas cuando las necesitas.' },
+  { icon: 'local', title: 'En el mismo teléfono', body: 'Dos personas, pasándolo por turnos. En damas chinas, hasta seis.' },
+  { icon: 'online', title: 'Online con amigos', body: 'Partidas por turnos con un código de invitación. Te avisamos cuando te toca y tienes tres días para mover.' },
+];
+
+const faqsEs = [
+  { q: '¿Es gratis?', a: 'Sí. La app se financia con anuncios, que nunca aparecen durante una partida.' },
+  { q: '¿Necesito una cuenta?', a: 'No para jugar contra la IA o en local: todo se guarda en tu teléfono. La cuenta solo hace falta para jugar online.' },
+  { q: '¿Qué reglas usa?', a: 'Las de cada reglamento oficial: FIDE para ajedrez, FMJD y WCDF para las damas internacionales e inglesas, y las de la variante española. Puedes consultarlas dentro de cada partida.' },
+  { q: '¿Se puede hacer trampa online?', a: 'Cada jugada se comprueba en nuestro servidor con el mismo motor de reglas de la app. Una jugada ilegal no llega a la partida.' },
+  { q: '¿Es accesible?', a: 'Con TalkBack se anuncia cada jugada en voz («Blancas: caballo a f3»), hay un tablero de alto contraste y la app respeta la opción de quitar animaciones del sistema.' },
+  { q: '¿Funciona en tablets?', a: 'Sí. En pantallas grandes el tablero ocupa toda la altura y la partida se muestra a dos columnas, en vertical o en horizontal.' },
+  { q: '¿Cómo borro mi cuenta?', a: 'Desde la app, en Ajustes → Cuenta → Eliminar cuenta, o pidiéndolo desde la página de eliminación de cuenta.' },
+];
+const gamesEn = [
+  { name: 'Chess', rulebook: 'FIDE Laws of Chess', points: ['Castling, en passant and promotion', 'Draws by repetition, 50 and 75 moves', 'Clock with increment'] },
+  { name: 'Draughts', rulebook: 'International (FMJD), English (WCDF) and Spanish', points: ['Mandatory capture as each variant requires', 'Flying or short kings', 'A warning when you must capture'] },
+  { name: 'Chinese checkers', rulebook: 'Standard rules', points: ['121-hole star board', '2 to 6 players', 'Chained jumps'] },
+];
+const modesEn = [
+  { icon: 'ai', title: 'Against the AI', body: 'Five levels, from beginner to one that thinks up to three seconds per move. With hints when you need them.' },
+  { icon: 'local', title: 'On the same phone', body: 'Two people, passing it back and forth. Up to six in Chinese checkers.' },
+  { icon: 'online', title: 'Online with friends', body: 'Turn-based games with an invite code. We notify you when it’s your turn, and you have three days to move.' },
+];
+const faqsEn = [
+  { q: 'Is it free?', a: 'Yes. The app is funded by ads, which never appear during a game.' },
+  { q: 'Do I need an account?', a: 'Not to play the AI or locally: everything is saved on your phone. You only need an account to play online.' },
+  { q: 'Which rules does it use?', a: 'Those of each official rulebook: FIDE for chess, FMJD and WCDF for international and English draughts, and the Spanish variant rules. You can read them inside every game.' },
+  { q: 'Can people cheat online?', a: 'Every move is checked on our server with the same rules engine as the app. An illegal move never reaches the game.' },
+  { q: 'Is it accessible?', a: 'With TalkBack every move is read aloud (“White: knight to f3”), there is a high-contrast board and the app follows the system setting to remove animations.' },
+  { q: 'Does it work on tablets?', a: 'Yes. On large screens the board uses the full height and the game is shown in two columns, in portrait or landscape.' },
+  { q: 'How do I delete my account?', a: 'In the app, under Settings → Account → Delete account, or by requesting it on the account deletion page.' },
+];
+
+const games = lang === 'en' ? gamesEn : gamesEs;
+const modes = lang === 'en' ? modesEn : modesEs;
+const faqs = lang === 'en' ? faqsEn : faqsEs;
+const T: string[] = lang === 'en' ? ["Chess and draughts with the rules of their official rulebooks. Against the AI, on the same phone or online with friends.", "Get it on Google Play", "See the games", "Free for Android. No account needed to play offline.", "Three games, real rules", "Each game follows its rulebook, including the details other apps simplify.", "Play your way", "Online, no cheating, no rush", "Create a game, share the code and play at your own pace. Your opponent sees you as", "@your_name", ", you get a notification when it’s your move and our server checks every move with the same rules engine.", "Invite code", "Built for good games", "Tap or drag", "Move however you like. If the destination isn’t legal, the piece goes back.", "Three boards", "Wood, felt and high contrast, in light or dark mode.", "Rules one tap away", "Check the rules of each variant without leaving the game.", "Your record", "History with move-by-move review and PGN and PDN export.", "Daily puzzle", "A mate in one or two every day, the same for everyone. Keep your streak.", "One-tap rematch", "After an online game, the next one with colors swapped.", "With or without an account", "Without an account", "Against the AI and locally", "Everything is saved on your phone", "Start in seconds", "With an account", "Everything above", "Online games and turn notifications", "Your unique username", "Your games on any phone", "Frequently asked questions", "Your next game starts here", "Example invite code"] : ["Ajedrez y damas con las reglas de sus reglamentos oficiales. Contra la IA, en el mismo teléfono u online con amigos.", "Descargar en Google Play", "Ver los juegos", "Gratis para Android. Sin cuenta para jugar offline.", "Tres juegos, reglas de verdad", "Cada juego sigue su reglamento, con los detalles que otras apps simplifican.", "Juega como quieras", "Online, sin trampas y sin prisas", "Crea una partida, comparte el código y juega a tu ritmo. Tu rival te ve como", "@tu_usuario", ", recibes un aviso cuando le toca a tu jugada y nuestro servidor valida cada movimiento con el mismo motor de reglas.", "Código de invitación", "Pensada para jugar bien", "Toca o arrastra", "Mueve como prefieras. Si el destino no vale, la pieza vuelve a su casilla.", "Tres tableros", "Madera, fieltro y alto contraste, en modo claro u oscuro.", "Reglas a un toque", "Consulta las reglas de cada variante sin salir de la partida.", "Tu balance", "Historial con revisión jugada a jugada y exportación a PGN y PDN.", "Problema del día", "Un mate en uno o en dos cada día, igual para todos. Mantén tu racha.", "Revancha con un toque", "Al terminar una partida online, la siguiente con los colores cambiados.", "Con cuenta o sin ella", "Sin cuenta", "Contra la IA y en local", "Todo se guarda en tu teléfono", "Empiezas en segundos", "Con cuenta", "Todo lo anterior", "Partidas online y avisos de turno", "Tu nombre de usuario único", "Tus partidas en cualquier teléfono", "Preguntas frecuentes", "Tu próxima partida empieza aquí", "Ejemplo de código de invitación"];
+---
+<Base lang={lang} title={lang === "en" ? "Escaque: Chess & Draughts" : undefined} description={lang === "en" ? "Chess and draughts with the rules of their official rulebooks. Against the AI, on the same phone or online with friends." : undefined}>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1 class="display">Escaque</h1>
+        <p class="hero-lead">{T[0]}</p>
+        <div class="cta">
+          <a class="btn btn-ivory" href={site.playUrl} rel="noopener">
+            <Icon name="chevron_right" size={20} /> {T[1]}
+          </a>
+          <a class="btn btn-ghost" href={`#${lang === "en" ? "games" : "juegos"}`}>{T[2]}</a>
+        </div>
+        <p class="hero-note">{T[3]}</p>
+      </div>
+      <div class="hero-board"><Board /></div>
+    </div>
+  </section>
+
+  <section id={lang === "en" ? "games" : "juegos"} class="section">
+    <div class="wrap">
+      <h2 class="h2">{T[4]}</h2>
+      <p class="lead">{T[5]}</p>
+      <div class="grid grid-3 games">
+        {games.map((g, i) => (
+          <article class="card game">
+            <div class="art" aria-hidden="true">
+              {i === 0 && <div class="art-chess"><Piece name="knight" size="100%" /></div>}
+              {i === 1 && <div class="art-draughts"><span class="disc dark"></span><span class="disc light"></span></div>}
+              {i === 2 && <div class="art-star"><Icon name="star" size={52} /></div>}
+            </div>
+            <h3 class="h3">{g.name}</h3>
+            <p class="muted rulebook">{g.rulebook}</p>
+            <ul>
+              {g.points.map((p) => <li><Icon name="check" size={18} />{p}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="online" class="section alt">
+    <div class="wrap">
+      <h2 class="h2">{T[6]}</h2>
+      <div class="grid grid-3">
+        {modes.map((m) => (
+          <article class="mode">
+            <span class="mode-icon"><Icon name={m.icon} size={28} /></span>
+            <h3 class="h3">{m.title}</h3>
+            <p class="muted">{m.body}</p>
+          </article>
+        ))}
+      </div>
+      <div class="online card">
+        <div>
+          <h3 class="h3">{T[7]}</h3>
+          <p class="muted">{T[8]} <span class="mono">{T[9]}</span>{T[10]}</p>
+        </div>
+        <div class="code" aria-label={T[37]}>
+          <span class="muted small">{T[11]}</span>
+          <span class="mono code-value">K7Q2ZP</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2 class="h2">{T[12]}</h2>
+      <div class="grid grid-2 features">
+        <div class="feature"><Icon name="drag" /><div><h3 class="h3">{T[13]}</h3><p class="muted">{T[14]}</p></div></div>
+        <div class="feature"><Icon name="board" /><div><h3 class="h3">{T[15]}</h3><p class="muted">{T[16]}</p></div></div>
+        <div class="feature"><Icon name="rules" /><div><h3 class="h3">{T[17]}</h3><p class="muted">{T[18]}</p></div></div>
+        <div class="feature"><Icon name="stats" /><div><h3 class="h3">{T[19]}</h3><p class="muted">{T[20]}</p></div></div>
+        <div class="feature"><Icon name="hint" /><div><h3 class="h3">{T[21]}</h3><p class="muted">{T[22]}</p></div></div>
+        <div class="feature"><Icon name="online" /><div><h3 class="h3">{T[23]}</h3><p class="muted">{T[24]}</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="wrap">
+      <h2 class="h2">{T[25]}</h2>
+      <div class="grid grid-2">
+        <div class="card plan">
+          <h3 class="h3">{T[26]}</h3>
+          <ul>
+            <li><Icon name="check" size={18} />{T[27]}</li>
+            <li><Icon name="check" size={18} />{T[28]}</li>
+            <li><Icon name="check" size={18} />{T[29]}</li>
+          </ul>
+        </div>
+        <div class="card plan main">
+          <h3 class="h3">{T[30]}</h3>
+          <ul>
+            <li><Icon name="check" size={18} />{T[31]}</li>
+            <li><Icon name="check" size={18} />{T[32]}</li>
+            <li><Icon name="check" size={18} />{T[33]}</li>
+            <li><Icon name="check" size={18} />{T[34]}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id={lang === "en" ? "faq" : "preguntas"} class="section">
+    <div class="wrap faq">
+      <h2 class="h2">{T[35]}</h2>
+      {faqs.map((f) => (
+        <details>
+          <summary>{f.q}<Icon name="chevron_right" size={20} class="chev" /></summary>
+          <p class="muted">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="section final">
+    <div class="wrap final-row">
+      <h2 class="h2">{T[36]}</h2>
+      <a class="btn btn-primary" href={site.playUrl} rel="noopener"><Icon name="chevron_right" size={20} /> {T[1]}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    background-color: var(--felt);
+    background-image: conic-gradient(rgb(246 243 234 / .05) 25%, transparent 0 50%, rgb(246 243 234 / .05) 0 75%, transparent 0);
+    background-size: 72px 72px;
+    color: var(--felt-ink);
+    padding-block: 7rem 4rem;
+  }
+  .hero-grid { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 880px) { .hero-grid { grid-template-columns: 1.05fr .95fr; } .hero { padding-block: 8rem 6rem; } }
+  .hero-lead { font-size: clamp(1.1rem, 2.6vw, 1.35rem); max-width: 34ch; margin: 1.25rem 0 2rem; color: #dce8e1; }
+  .cta { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .hero-note { margin-top: 1rem; font-size: .9rem; opacity: .8; }
+  .hero-board { max-width: 520px; width: 100%; justify-self: center; }
+
+  .games { margin-top: 2rem; }
+  .game ul, .plan ul { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .55rem; }
+  .game li, .plan li { display: flex; gap: .5rem; align-items: flex-start; }
+  .game li :global(.icon), .plan li :global(.icon) { color: var(--brand); flex: none; margin-top: .15rem; }
+  .rulebook { margin: .25rem 0 0; font-size: .95rem; }
+  .art { width: 72px; height: 72px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 1rem; }
+  .art-chess { width: 100%; height: 100%; padding: 6px; background: conic-gradient(var(--board-dark) 25%, var(--board-light) 0 50%, var(--board-dark) 0 75%, var(--board-light) 0) 0 0 / 72px 72px; }
+  .art-chess :global(.piece), .art-chess :global(svg) { width: 100%; height: 100%; display: block; }
+  .art-draughts { width: 100%; height: 100%; background: var(--board-dark); position: relative; }
+  .disc { position: absolute; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #3a2e22; }
+  .disc.dark { background: #23201d; left: 9px; top: 9px; }
+  .disc.light { background: #f6f3ea; right: 9px; bottom: 9px; }
+  .art-star { width: 100%; height: 100%; background: var(--board-light); display: grid; place-items: center; color: #c2410c; }
+
+  .alt { background: var(--surface-raised); }
+  .mode-icon { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--surface); color: var(--brand); margin-bottom: .75rem; }
+  #online .grid { margin-top: 2rem; }
+  .online { margin-top: 2rem; display: grid; gap: 1.5rem; align-items: center; border: 1.5px solid var(--brand); }
+  @media (min-width: 720px) { .online { grid-template-columns: 1fr auto; } }
+  .code { display: grid; gap: .25rem; justify-items: center; padding: 1rem 1.5rem; border-radius: var(--radius-md); background: var(--surface-raised); }
+  .code-value { font-size: 2rem; letter-spacing: .12em; font-weight: 500; }
+  .small { font-size: .85rem; }
+
+  .features { margin-top: 2rem; }
+  .feature { display: flex; gap: 1rem; align-items: flex-start; }
+  .feature > :global(.icon) { color: var(--brand); flex: none; margin-top: .2rem; }
+  .feature p { margin: .35rem 0 0; }
+
+  .plan.main { border: 1.5px solid var(--brand); }
+  .alt .grid-2 { margin-top: 2rem; }
+
+  .faq { max-width: 760px; }
+  .faq h2 { margin-bottom: 1.5rem; }
+  details { border-bottom: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 0; font-weight: 600; font-size: 1.05rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary :global(.chev) { transition: transform .2s; color: var(--ink-muted); }
+  details[open] summary :global(.chev) { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { summary :global(.chev) { transition: none; } }
+  details p { margin: 0 0 1.1rem; }
+
+  .final-row { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
+</style>

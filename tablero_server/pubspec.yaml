@@ -1,0 +1,22 @@
+name: tablero_server
+description: Servidor autoritativo de Tablero — valida jugadas online con tablero_engine y envía notificaciones FCM.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
+  crypto: ^3.0.3
+  http: ^1.2.2
+  jose: ^0.3.4
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  tablero_engine:
+    path: ../tablero_engine
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

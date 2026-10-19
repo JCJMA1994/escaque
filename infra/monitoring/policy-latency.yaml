@@ -1,0 +1,18 @@
+displayName: "Escaque API (__ENV__): latencia p95 > 1,5 s"
+combiner: OR
+severity: WARNING
+conditions:
+  - displayName: "Percentil 95 de latencia durante 10 minutos"
+    conditionPrometheusQueryLanguage:
+      query: |
+        histogram_quantile(0.95,
+          sum by (le) (rate(run_googleapis_com:request_latencies_bucket{monitored_resource="cloud_run_revision",service_name="tablero-api"}[5m]))
+        ) > 1500
+      duration: 600s
+      evaluationInterval: 60s
+documentation:
+  mimeType: text/markdown
+  content: |
+    Las peticiones van lentas (milisegundos). Revisa instancias en Cloud Run (¿llegó a `max-instances`?),
+    conflictos de escritura en los registros y la latencia de Firestore.
+notificationChannels: ["__CHANNEL__"]

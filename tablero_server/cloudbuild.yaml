@@ -1,0 +1,15 @@
+# Desde la carpeta padre:
+#   gcloud builds submit --config tablero_server/cloudbuild.yaml \
+#     --substitutions=_REGION=southamerica-east1 .
+# _TAG: etiqueta inmutable de la imagen (el CI usa el commit).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-f', 'tablero_server/Dockerfile',
+           '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/tablero/tablero-api:${_TAG}',
+           '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/tablero/tablero-api:latest', '.']
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/tablero/tablero-api:${_TAG}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/tablero/tablero-api:latest'
+substitutions:
+  _REGION: southamerica-east1
+  _TAG: manual

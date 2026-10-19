@@ -1,0 +1,11 @@
+name: tablero_engine
+description: Motor de reglas de Tablero — ajedrez (FIDE), damas internacional/inglesa/española y damas chinas, en Dart puro.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

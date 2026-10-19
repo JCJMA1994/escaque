@@ -1,0 +1,33 @@
+---
+import Legal from '../../layouts/Legal.astro';
+import { site } from '../../site';
+const subject = encodeURIComponent('Delete my Escaque account');
+const body = encodeURIComponent('Hello,\n\nI want to delete my Escaque account.\n\nUsername: @\nAccount email: \n');
+---
+<Legal lang="en" title="Delete your Escaque account" description="How to delete your Escaque account and what data is deleted.">
+  <h2>From the app (immediately)</h2>
+  <ol>
+    <li>Open Escaque and go to <strong>Settings → Account</strong>.</li>
+    <li>Tap <strong>Delete account</strong> and confirm. We may ask for your password or to sign in with Google again.</li>
+  </ol>
+
+  <h2>Without the app</h2>
+  <p>Write to us from your account’s email address:</p>
+  <p><a class="btn btn-primary" href={`mailto:${site.email}?subject=${subject}&body=${body}`}>Request deletion by email</a></p>
+  <p class="muted">To protect your account, we only handle requests sent from the email you signed up with. We will complete it within 30 days and confirm by email.</p>
+
+  <h2>What is deleted</h2>
+  <ul>
+    <li>Your sign-in account (email and sign-in method).</li>
+    <li>Your profile, your notification preferences and your devices’ notification tokens.</li>
+    <li>Your username, which becomes available to others.</li>
+    <li>Your friendships, requests and blocks, and your rating (you leave the leaderboards at their next update).</li>
+  </ul>
+  <h2>What happens to your games</h2>
+  <ul>
+    <li>Ongoing online games end and your opponent wins.</li>
+    <li>Games waiting for an opponent are cancelled.</li>
+    <li>In finished games your name is replaced by “Deleted account” so your opponents keep their history.</li>
+    <li>Games saved on your phone without an account were never sent to us: they stay on your device until you uninstall the app.</li>
+  </ul>
+</Legal>

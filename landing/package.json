@@ -1,0 +1,23 @@
+{
+  "name": "escaque-landing",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prebuild": "node scripts/catalog.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:qa": "node scripts/catalog.mjs && PUBLIC_ENV=qa SITE_URL=https://escaque-qa.system-failed-tech.com astro build",
+    "build:prod": "node scripts/catalog.mjs && PUBLIC_ENV=prod SITE_URL=https://escaque.system-failed-tech.com astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "astro": "5.18.2",
+    "typescript": "^5.9.3"
+  }
+}

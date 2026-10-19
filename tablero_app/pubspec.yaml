@@ -1,0 +1,82 @@
+name: tablero_app
+description: Tablero — juegos de mesa clásicos con reglas oficiales.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.47.0"
+
+# Versiones comprobadas el 18/10/2026 en los repositorios oficiales. Firebase
+# se queda en la serie anterior a la 5.x (publicada el 15/10/2026, demasiado
+# reciente); todos los paquetes de Firebase son del mismo tren de versiones.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cloud_firestore: ^6.10.0
+  firebase_analytics: ^12.6.0
+  firebase_app_check: ^0.4.8
+  firebase_auth: ^6.7.0
+  firebase_core: ^4.15.0
+  firebase_crashlytics: ^5.4.0
+  firebase_messaging: ^16.7.0
+  firebase_remote_config: ^6.7.0
+  flame: ^1.38.0
+  flame_audio: ^2.12.0
+  flutter_local_notifications: ^21.0.0
+  flutter_riverpod: ^2.6.1
+  flutter_svg: ^2.2.0
+  games_services: ^5.1.0
+  go_router: ^14.8.1
+  google_mobile_ads: ^9.0.0
+  google_sign_in: ^7.2.0
+  http: ^1.5.0
+  crypto: ^3.0.3
+  in_app_purchase: ^3.3.0
+  in_app_review: ^2.0.9
+  in_app_update: ^4.2.3
+  package_info_plus: ^9.0.0
+  path: ^1.9.0
+  shared_preferences: ^2.5.0
+  sqflite: ^2.4.0
+  tablero_engine:
+    path: ../tablero_engine
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# Icono del lanzador. Fuente: assets/icon/*.svg (generados con tool/brand/).
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon/icon_full.png
+  adaptive_icon_background: assets/icon/icon_background.png
+  adaptive_icon_foreground: assets/icon/icon_foreground.png
+  adaptive_icon_monochrome: assets/icon/icon_monochrome.png
+  min_sdk_android: 24
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/audio/
+    - assets/icons/
+    - assets/pieces/
+    - assets/puzzles_chess.json
+    - assets/puzzles_draughts.json
+    - assets/icon/icon_full.png
+  # Fuentes incluidas: funcionan sin conexión desde el primer arranque.
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo-Variable.ttf
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf

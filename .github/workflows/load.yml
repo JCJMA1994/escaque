@@ -1,0 +1,34 @@
+# Prueba de carga contra qa (manual). Ver PLAN.md, O4.
+name: Carga (qa)
+
+on:
+  workflow_dispatch:
+    inputs:
+      games: { description: Partidas simultáneas, default: '200' }
+      think: { description: Segundos medios entre jugadas, default: '2' }
+
+permissions:
+  contents: read
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    environment: qa
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - name: Ejecutar
+        working-directory: tool/load
+        env:
+          BASE_URL: ${{ vars.API_URL }}
+          LOAD_TEST_SECRET: ${{ secrets.LOAD_TEST_SECRET }}
+        run: |
+          k6 run -e BASE_URL="$BASE_URL" -e LOAD_TEST_SECRET="$LOAD_TEST_SECRET" \
+            -e GAMES=${{ github.event.inputs.games }} -e THINK=${{ github.event.inputs.think }} \
+            --summary-export=resumen.json partidas.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: carga-${{ github.run_number }}
+          path: tool/load/resumen.json

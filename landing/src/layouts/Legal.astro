@@ -1,0 +1,21 @@
+---
+import Base from './Base.astro';
+interface Props { title: string; description: string; lang?: 'es' | 'en'; }
+const { title, description, lang = 'es' } = Astro.props;
+---
+<Base title={title} description={description} lang={lang}>
+  <div class="legal-head">
+    <div class="wrap"><h1 class="h2">{title}</h1></div>
+  </div>
+  <article class="wrap legal"><slot /></article>
+</Base>
+<style>
+  .legal-head { background: var(--felt); color: var(--felt-ink); padding: 7rem 0 2.5rem; }
+  .legal { max-width: 760px; padding-block: 2.5rem; }
+  .legal :global(h2) { font-size: 1.25rem; font-weight: 700; margin: 2.25rem 0 .5rem; }
+  .legal :global(li) { margin-bottom: .4rem; }
+  .legal :global(table) { border-collapse: collapse; width: 100%; font-size: .95rem; margin: 1rem 0; display: block; overflow-x: auto; }
+  .legal :global(th), .legal :global(td) { border: 1px solid var(--line); padding: .6rem .7rem; text-align: left; vertical-align: top; }
+  .legal :global(th) { background: var(--surface-raised); }
+  .legal :global(.note) { background: var(--surface-raised); border-radius: 12px; padding: 1rem 1.2rem; }
+</style>

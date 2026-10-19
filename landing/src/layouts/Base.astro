@@ -1,0 +1,125 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { site, indexable } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: 'es' | 'en';
+}
+const { title, lang = 'es' } = Astro.props;
+const description = Astro.props.description ?? (lang === 'en' ? site.descriptionEn : site.description);
+// Páginas equivalentes en cada idioma (hreflang y selector).
+const pairs: Record<string, string> = {
+  '/': '/en',
+  '/privacidad': '/en/privacy',
+  '/eliminar-cuenta': '/en/delete-account',
+};
+// En la compilación la ruta puede llevar .html (build.format 'file').
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/(index)?$/, '') || '/';
+const esPath = lang === 'es' ? path : (Object.entries(pairs).find(([, en]) => en === path)?.[0] ?? '/');
+const enPath = pairs[esPath] ?? '/en';
+const otherHref = lang === 'es' ? enPath : esPath;
+const home = lang === 'en' ? '/en' : '/';
+const L = lang === 'en'
+  ? { games: 'Games', online: 'Online', faq: 'FAQ', gamesId: 'games', faqId: 'faq', privacy: 'Privacy policy',
+      del: 'Delete my account', tagline: 'Chess and draughts with official rules for Android.', skip: 'Skip to content',
+      other: 'Español', homeLabel: 'Escaque, home', env: 'Environment', privacyHref: '/en/privacy', delHref: '/en/delete-account' }
+  : { games: 'Juegos', online: 'Online', faq: 'Preguntas', gamesId: 'juegos', faqId: 'preguntas', privacy: 'Política de privacidad',
+      del: 'Eliminar mi cuenta', tagline: 'Ajedrez y damas con reglas oficiales para Android.', skip: 'Saltar al contenido',
+      other: 'English', homeLabel: 'Escaque, inicio', env: 'Entorno', privacyHref: '/privacidad', delHref: '/eliminar-cuenta' };
+const fullTitle = title ? `${title} · ${site.name}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const og = new URL('/og.png', Astro.site);
+const year = 2026;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={new URL(esPath, Astro.site)} />
+    <link rel="alternate" hreflang="en" href={new URL(enPath, Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(esPath, Astro.site)} />
+    {!indexable && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#17543f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_ES'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'MobileApplication',
+      name: site.title,
+      operatingSystem: 'Android',
+      applicationCategory: 'GameApplication',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      url: site.playUrl,
+    })} />
+  </head>
+  <body>
+    <a class="sr-only" href="#contenido">{L.skip}</a>
+    {site.env !== 'prod' && <div class="env">{L.env}: {site.env.toUpperCase()}</div>}
+    <header class="top">
+      <div class="wrap top-row">
+        <a href={home} class="brand" aria-label={L.homeLabel}>
+          <img src="/favicon.svg" width="32" height="32" alt="" />
+          <span>Escaque</span>
+        </a>
+        <nav aria-label={lang === 'en' ? 'Main' : 'Principal'}>
+          <a href={`${home === '/' ? '/' : home}#${L.gamesId}`}>{L.games}</a>
+          <a href={`${home === '/' ? '/' : home}#online`}>{L.online}</a>
+          <a href={`${home === '/' ? '/' : home}#${L.faqId}`}>{L.faq}</a>
+          <a href={otherHref} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'} class="lang">{L.other}</a>
+        </nav>
+      </div>
+    </header>
+    <main id="contenido"><slot /></main>
+    <footer class="foot">
+      <div class="wrap foot-grid">
+        <div>
+          <a href={home} class="brand"><img src="/favicon.svg" width="28" height="28" alt="" /><span>Escaque</span></a>
+          <p class="muted">{L.tagline}</p>
+        </div>
+        <nav aria-label={lang === 'en' ? 'Legal and help' : 'Legal y ayuda'} class="foot-links">
+          <a href={L.privacyHref}>{L.privacy}</a>
+          <a href={L.delHref}>{L.del}</a>
+          <a href={otherHref} hreflang={lang === 'es' ? 'en' : 'es'}>{L.other}</a>
+          <a href={`mailto:${site.email}`}><Icon name="mail" size={18} /> {site.email}</a>
+        </nav>
+      </div>
+      <p class="wrap muted small">© {year} Escaque. {lang === 'en' ? 'Google Play is a trademark of Google LLC.' : 'Google Play es una marca de Google LLC.'}</p>
+    </footer>
+  </body>
+</html>
+<style>
+  .env { background: var(--accent); color: var(--accent-ink); text-align: center; font: 600 .8rem/2 var(--sans); }
+  .top { position: absolute; inset-inline: 0; z-index: 10; }
+  .top-row { display: flex; align-items: center; justify-content: space-between; min-height: 72px; }
+  .brand { display: inline-flex; align-items: center; gap: .55rem; color: inherit; text-decoration: none; font-weight: 800; font-stretch: 125%; font-size: 1.15rem; }
+  .brand img { border-radius: 8px; }
+  .top .brand, .top nav a { color: var(--felt-ink); }
+  .top nav { display: flex; gap: 1.25rem; }
+  .top nav a { text-decoration: none; font-weight: 600; font-size: .95rem; }
+  @media (max-width: 520px) { .top nav a:not(.lang) { display: none; } }
+  .top nav .lang { border: 1px solid rgb(246 243 234 / .45); border-radius: 999px; padding: .2rem .7rem; }
+  .foot { border-top: 1px solid var(--line); padding-block: 2.5rem 1.5rem; margin-top: 2rem; }
+  .foot-grid { display: grid; gap: 1.5rem; }
+  @media (min-width: 720px) { .foot-grid { grid-template-columns: 1fr auto; align-items: start; } }
+  .foot-links { display: grid; gap: .6rem; }
+  .foot-links a { display: inline-flex; align-items: center; gap: .4rem; }
+  .small { font-size: .85rem; }
+</style>

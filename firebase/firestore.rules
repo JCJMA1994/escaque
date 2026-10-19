@@ -1,0 +1,85 @@
+rules_version = '2';
+
+// Con el servidor autoritativo (tablero_server en Cloud Run), los clientes
+// solo LEEN las partidas. Crear, unirse, mover, abandonar y tablas pasan por
+// la API, que valida con el motor. El servidor usa su cuenta de servicio y no
+// está sujeto a estas reglas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Online exige cuenta registrada: sin sesiones anónimas y, con correo y
+    // contraseña, el correo verificado (ver tool/accounts.md).
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && (request.auth.token.firebase.sign_in_provider != 'password'
+            || request.auth.token.email_verified == true);
+    }
+
+    match /games/{gameId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+      allow write: if false;
+    }
+
+    // Códigos de invitación: solo el servidor.
+    match /invites/{code} {
+      allow read, write: if false;
+    }
+
+    // Amistades: las leen sus dos miembros; solo el servidor escribe.
+    match /friendships/{key} {
+      allow read: if signedIn() && request.auth.uid in resource.data.users;
+      allow write: if false;
+    }
+
+    // Valoraciones: cada cuenta lee la suya; las clasificaciones, cualquiera con sesión.
+    match /ratings/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /leaderboards/{key} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Compras verificadas: solo el servidor (contienen el uid y el pedido).
+    match /purchases/{key} {
+      allow read, write: if false;
+    }
+
+    // Nombres de usuario reservados: solo el servidor (garantiza la unicidad).
+    match /usernames/{name} {
+      allow read, write: if false;
+    }
+
+    // Perfil propio. `username` y `usernameChangedAt` los escribe solo el
+    // servidor; la app solo cambia sus preferencias de avisos. Se puede leer
+    // con el correo aún sin verificar (se elige el nombre antes de verificar).
+    match /users/{uid} {
+      function owner() {
+        return request.auth != null
+          && request.auth.token.firebase.sign_in_provider != 'anonymous'
+          && request.auth.uid == uid;
+      }
+      function validPrefs() {
+        return (!('notify' in request.resource.data) || request.resource.data.notify is bool)
+          && (!('reminders' in request.resource.data) || request.resource.data.reminders is bool)
+          && (!('locale' in request.resource.data) || request.resource.data.locale in ['es', 'en'])
+          && (!('friendRequests' in request.resource.data) || request.resource.data.friendRequests is bool);
+      }
+
+      allow read: if owner();
+      // Se comparan solo los campos que cambian: los del servidor se conservan.
+      allow create: if owner() && validPrefs()
+        && request.resource.data.keys().hasOnly(['notify', 'reminders', 'locale', 'friendRequests', 'updatedAt']);
+      allow update: if owner() && validPrefs()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notify', 'reminders', 'locale', 'friendRequests', 'updatedAt']);
+
+      // Tokens de FCM del propio usuario (el id del documento es el token).
+      match /devices/{token} {
+        allow read, delete: if owner();
+        allow create, update: if owner()
+          && request.resource.data.keys().hasOnly(['platform', 'updatedAt']);
+      }
+    }
+  }
+}

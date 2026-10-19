@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../site';
+---
+<Base title="Invitación a una partida" description="Te han invitado a una partida de Escaque.">
+  <section class="inv">
+    <div class="wrap inv-box">
+      <h1 class="h2" data-en="You’ve been invited to a game">Te han invitado a una partida</h1>
+      <p data-en="If you have Escaque installed, this link opens it directly. If not, install it and join with this code under <strong>Play online → Join</strong>:">Si tienes Escaque instalada, este enlace la abre directamente. Si no, instálala y entra con este código en <strong>Jugar online → Unirse</strong>:</p>
+      <p class="code mono" id="code" aria-live="polite">······</p>
+      <div class="cta">
+        <a class="btn btn-ivory" id="open" href="#"><Icon name="online" size={20} /> <span data-en="Open in the app">Abrir en la app</span></a>
+        <a class="btn btn-ghost" href={site.playUrl} rel="noopener"><Icon name="chevron_right" size={20} /> <span data-en="Install Escaque">Instalar Escaque</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+<script>
+  // Una sola URL para todos: inglés si el navegador no está en español.
+  if (!navigator.language.toLowerCase().startsWith('es')) {
+    document.documentElement.lang = 'en';
+    document.querySelectorAll<HTMLElement>('[data-en]').forEach((el) => (el.innerHTML = el.dataset.en ?? el.innerHTML));
+  }
+  // /j/CÓDIGO (Firebase Hosting reescribe /j/** a esta página).
+  const code = (location.pathname.split('/')[2] ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  const el = document.getElementById('code');
+  if (el && code.length === 6) el.textContent = code;
+  // Intento explícito de abrir la app (si App Links no lo hizo ya).
+  const open = document.getElementById('open') as HTMLAnchorElement | null;
+  if (open) open.href = `intent://${location.host}/j/${code}#Intent;scheme=https;end`;
+</script>
+<style>
+  .inv { background: var(--felt); color: var(--felt-ink); padding: 8rem 0 5rem; }
+  .inv-box { max-width: 640px; }
+  .inv p { color: #dce8e1; }
+  .code { font-size: clamp(2.4rem, 10vw, 3.5rem); letter-spacing: .15em; color: var(--felt-ink) !important; margin: 1.5rem 0; }
+  .cta { display: flex; flex-wrap: wrap; gap: .75rem; }
+</style>

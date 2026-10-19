@@ -1,0 +1,19 @@
+displayName: "Escaque (__ENV__): fallo del trabajo de plazos"
+combiner: OR
+severity: ERROR
+conditions:
+  - displayName: "Cloud Scheduler tablero-deadlines con error"
+    conditionMatchedLog:
+      filter: |
+        resource.type="cloud_scheduler_job"
+        resource.labels.job_id="tablero-deadlines"
+        severity>=ERROR
+alertStrategy:
+  notificationRateLimit:
+    period: 3600s
+documentation:
+  mimeType: text/markdown
+  content: |
+    El trabajo de plazos (recordatorios y derrotas por tiempo) falla. Si responde 401, revisa
+    `SCHEDULER_SA` y `SERVICE_URL` en Cloud Run (guía, paso 10).
+notificationChannels: ["__CHANNEL__"]

@@ -1,0 +1,5 @@
+{
+  "ENV": "dev",
+  "TABLERO_API": "https://api-escaque-dev.system-failed-tech.com",
+  "INVITE_BASE_URL": "https://escaque-qa.system-failed-tech.com"
+}

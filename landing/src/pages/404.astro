@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Piece from '../components/Piece.astro';
+---
+<Base title="Página no encontrada">
+  <section class="nf">
+    <div class="wrap nf-row">
+      <Piece name="king" white={false} size={96} />
+      <div>
+        <h1 class="h2">Jugada ilegal · Illegal move</h1>
+        <p>Esta página no existe. Vuelve al <a href="/">inicio</a>.</p>
+        <p lang="en">This page doesn’t exist. Back to the <a href="/en">home page</a>.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { background: var(--felt); color: var(--felt-ink); padding: 9rem 0 5rem; }
+  .nf a { color: var(--felt-ink); }
+  .nf-row { display: flex; gap: 1.5rem; align-items: center; }
+</style>

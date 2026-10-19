@@ -1,0 +1,206 @@
+# Despliegue por entornos:
+#   push a main          → qa
+#   etiqueta vX.Y.Z      → prod (con aprobación en el entorno «prod» de GitHub)
+#   manual (Run workflow) → dev, qa o prod
+# Cada entorno de GitHub (dev / qa / prod) tiene sus propias variables y
+# secretos: proyecto de Google Cloud, cuenta de despliegue, firma, etc.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Entorno
+        type: choice
+        options: [dev, qa, prod]
+        default: dev
+      android:
+        description: Compilar y distribuir la app
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || (startsWith(github.ref, 'refs/tags/') && 'prod' || 'qa') }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write   # Workload Identity Federation: sin claves JSON de Google Cloud
+
+env:
+  FLUTTER_VERSION: '3.47.7'
+  NODE_VERSION: '22'
+  REGION: southamerica-east1
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.pick.outputs.env }}
+      android: ${{ steps.pick.outputs.android }}
+    steps:
+      - id: pick
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "env=${{ github.event.inputs.environment }}" >> "$GITHUB_OUTPUT"
+            echo "android=${{ github.event.inputs.android }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "env=prod" >> "$GITHUB_OUTPUT"; echo "android=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=qa" >> "$GITHUB_OUTPUT"; echo "android=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  test:
+    needs: setup
+    uses: ./.github/workflows/ci.yml
+
+  server:
+    name: Servidor → Cloud Run
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.env }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Compilar imagen (ejecuta los tests dentro)
+        run: |
+          gcloud builds submit . --project=${{ vars.GCP_PROJECT_ID }} \
+            --config=tablero_server/cloudbuild.yaml \
+            --substitutions=_REGION=${{ env.REGION }},_TAG=${{ github.sha }}
+      - name: Desplegar
+        run: |
+          gcloud run deploy tablero-api --project=${{ vars.GCP_PROJECT_ID }} --region=${{ env.REGION }} \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/tablero/tablero-api:${{ github.sha }} \
+            --update-env-vars=ENVIRONMENT=${{ needs.setup.outputs.env }},PLAY_PACKAGE=${{ vars.ANDROID_PACKAGE }}
+      - name: Comprobar
+        run: |
+          URL=$(gcloud run services describe tablero-api --project=${{ vars.GCP_PROJECT_ID }} --region=${{ env.REGION }} --format='value(status.url)')
+          test "$(curl -fsS "$URL/healthz")" = "ok"
+
+  firebase:
+    name: Firebase (reglas, índices, landing, API)
+    needs: [setup, server]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.env }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+      - name: Compilar landing
+        if: needs.setup.outputs.env != 'dev'
+        working-directory: landing
+        env:
+          PUBLIC_ENV: ${{ needs.setup.outputs.env }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE }}
+          ANDROID_SHA256: ${{ vars.ANDROID_SHA256 }}
+        run: npm ci && npm run build
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - name: Desplegar
+        env:
+          ENV_NAME: ${{ needs.setup.outputs.env }}
+        run: |
+          test -f .firebaserc || { echo "Falta .firebaserc (copia .firebaserc.example con tus IDs y súbelo)"; exit 1; }
+          if [ "$ENV_NAME" = "dev" ]; then ONLY="firestore:rules,firestore:indexes,hosting:api"; \
+          else ONLY="firestore:rules,firestore:indexes,hosting"; fi
+          npx --yes firebase-tools@15.32.1 deploy --project "$ENV_NAME" --only "$ONLY" --non-interactive
+
+  android:
+    name: App Android
+    needs: [setup, test]
+    if: needs.setup.outputs.android == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.env }}
+    defaults: { run: { working-directory: tablero_app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Configuración del entorno y firma
+        env:
+          APP_CONFIG_JSON: ${{ secrets.APP_CONFIG_JSON }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$APP_CONFIG_JSON" > config/ci.json
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          cat > android/key.properties <<PROPS
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=$RUNNER_TEMP/upload.jks
+          PROPS
+      - run: flutter pub get
+      - name: Versión (número de compilación = número de ejecución)
+        run: echo "BUILD_NUMBER=$((1000 + ${{ github.run_number }}))" >> "$GITHUB_ENV"
+
+      # dev y qa: APK a Firebase App Distribution para testers
+      - name: APK (dev/qa)
+        if: needs.setup.outputs.env != 'prod'
+        run: |
+          flutter build apk --release --flavor ${{ needs.setup.outputs.env }} \
+            --dart-define-from-file=config/ci.json --build-number=$BUILD_NUMBER
+      - uses: google-github-actions/auth@v2
+        if: needs.setup.outputs.env != 'prod'
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - name: Distribuir a testers
+        if: needs.setup.outputs.env != 'prod'
+        run: |
+          npx --yes firebase-tools@15.32.1 appdistribution:distribute \
+            build/app/outputs/flutter-apk/app-${{ needs.setup.outputs.env }}-release.apk \
+            --app "${{ vars.FIREBASE_ANDROID_APP_ID }}" --groups "testers" \
+            --release-notes "${{ github.sha }}: ${{ github.event.head_commit.message || 'manual' }}"
+
+      # prod: AAB a la prueba interna de Google Play
+      - name: AAB (prod)
+        if: needs.setup.outputs.env == 'prod'
+        run: |
+          flutter build appbundle --release --flavor prod \
+            --dart-define-from-file=config/ci.json --build-number=$BUILD_NUMBER \
+            --obfuscate --split-debug-info=build/symbols
+      - uses: actions/upload-artifact@v4
+        if: needs.setup.outputs.env == 'prod'
+        with:
+          name: simbolos-${{ github.ref_name }}
+          path: tablero_app/build/symbols
+          retention-days: 365
+      - uses: google-github-actions/auth@v2
+        if: needs.setup.outputs.env == 'prod'
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - name: Símbolos de Dart a Crashlytics (trazas legibles con la app ofuscada)
+        if: needs.setup.outputs.env == 'prod'
+        run: |
+          npx --yes firebase-tools@15.32.1 crashlytics:symbols:upload \
+            --app="${{ vars.FIREBASE_ANDROID_APP_ID }}" build/symbols
+      - uses: r0adkll/upload-google-play@v1
+        if: needs.setup.outputs.env == 'prod'
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ vars.ANDROID_PACKAGE }}
+          releaseFiles: tablero_app/build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          track: internal
+          status: ${{ vars.PLAY_RELEASE_STATUS || 'draft' }}

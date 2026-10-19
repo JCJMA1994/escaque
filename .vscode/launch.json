@@ -1,0 +1,119 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "App: Escaque (dev)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "cwd": "tablero_app",
+      "args": [
+        "--flavor",
+        "dev",
+        "--dart-define-from-file=config/dev.json"
+      ]
+    },
+    {
+      "name": "App: Escaque (qa)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "cwd": "tablero_app",
+      "args": [
+        "--flavor",
+        "qa",
+        "--dart-define-from-file=config/qa.json"
+      ]
+    },
+    {
+      "name": "App: Escaque (prod)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "cwd": "tablero_app",
+      "args": [
+        "--flavor",
+        "prod",
+        "--dart-define-from-file=config/prod.json"
+      ]
+    },
+    {
+      "name": "App: Tests unitarios",
+      "type": "dart",
+      "request": "launch",
+      "program": "test",
+      "cwd": "tablero_app"
+    },
+    {
+      "name": "App: Test de integración (offline flow)",
+      "type": "dart",
+      "request": "launch",
+      "program": "integration_test/offline_flow_test.dart",
+      "cwd": "tablero_app",
+      "args": [
+        "--flavor",
+        "dev",
+        "--dart-define-from-file=config/dev.json"
+      ]
+    },
+    {
+      "name": "Server: Iniciar servidor local",
+      "type": "dart",
+      "request": "launch",
+      "program": "bin/server.dart",
+      "cwd": "tablero_server",
+      "env": {
+        "PORT": "8080",
+        "PROJECT_ID": "demo-escaque",
+        "PROJECT_NUMBER": "1234567890",
+        "APP_CHECK": "off",
+        "SCHEDULER_SA": "scheduler@demo-escaque.iam.gserviceaccount.com",
+        "SERVICE_URL": "http://localhost:8080",
+        "ENVIRONMENT": "dev"
+      }
+    },
+    {
+      "name": "Server: Tests unitarios",
+      "type": "dart",
+      "request": "launch",
+      "program": "test",
+      "cwd": "tablero_server"
+    },
+    {
+      "name": "Engine: Tests unitarios",
+      "type": "dart",
+      "request": "launch",
+      "program": "test",
+      "cwd": "tablero_engine"
+    },
+    {
+      "name": "Engine: Ejemplo (main.dart)",
+      "type": "dart",
+      "request": "launch",
+      "program": "example/main.dart",
+      "cwd": "tablero_engine"
+    },
+    {
+      "name": "Landing: Servidor dev (Astro)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/landing/node_modules/astro/astro.js",
+      "args": [
+        "dev"
+      ],
+      "cwd": "${workspaceFolder}/landing",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Landing: Compilar (Astro build)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/landing/node_modules/astro/astro.js",
+      "args": [
+        "build"
+      ],
+      "cwd": "${workspaceFolder}/landing",
+      "console": "integratedTerminal"
+    }
+  ]
+}

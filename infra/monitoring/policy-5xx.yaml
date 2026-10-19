@@ -1,0 +1,21 @@
+displayName: "Escaque API (__ENV__): errores 5xx > 2 %"
+combiner: OR
+severity: ERROR
+conditions:
+  - displayName: "Proporción de respuestas 5xx en 5 minutos"
+    conditionPrometheusQueryLanguage:
+      query: |
+        sum(rate(run_googleapis_com:request_count{monitored_resource="cloud_run_revision",service_name="tablero-api",response_code_class="5xx"}[5m]))
+        /
+        sum(rate(run_googleapis_com:request_count{monitored_resource="cloud_run_revision",service_name="tablero-api"}[5m]))
+        > 0.02
+      duration: 300s
+      evaluationInterval: 60s
+documentation:
+  mimeType: text/markdown
+  content: |
+    Más del 2 % de las respuestas de `tablero-api` son errores del servidor.
+    1. Cloud Error Reporting: ¿error nuevo tras un despliegue?
+    2. Si es el despliegue: Cloud Run → Revisiones → 100 % del tráfico a la anterior.
+    3. Si el online no funciona: Remote Config `online_enabled = false`.
+notificationChannels: ["__CHANNEL__"]

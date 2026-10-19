@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "escaque-dev",
+    "dev": "escaque-dev",
+    "qa": "escaque-qa",
+    "prod": "escaque-prod"
+  },
+  "targets": {
+    "escaque-dev": {
+      "hosting": { "api": ["escaque-dev-api"] }
+    },
+    "escaque-qa": {
+      "hosting": { "landing": ["escaque-qa"], "api": ["escaque-qa-api"] }
+    },
+    "escaque-prod": {
+      "hosting": { "landing": ["escaque-prod"], "api": ["escaque-prod-api"] }
+    }
+  }
+}

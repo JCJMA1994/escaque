@@ -1,0 +1,79 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { site } from '../site';
+const mail = `mailto:${site.email}`;
+---
+<Legal lang="es" title="Política de privacidad" description="Qué datos trata Escaque, para qué, con qué base y cómo ejercer tus derechos.">
+  <p class="note"><strong>Borrador para revisar con asesoría legal antes de publicar.</strong> Redactado conforme a la Ley N.º 29733, Ley de Protección de Datos Personales del Perú, y su Reglamento (Decreto Supremo N.º 016-2024-JUS), y teniendo en cuenta el RGPD para usuarios de la Unión Europea. Completa los datos entre corchetes.</p>
+  <p class="muted">Última actualización: {site.updated}</p>
+
+  <h2>Resumen</h2>
+  <ul>
+    <li>Para jugar sin cuenta no recogemos datos personales: tus partidas se quedan en tu teléfono.</li>
+    <li>La cuenta (correo y nombre de usuario) solo hace falta para jugar online.</li>
+    <li>Las estadísticas de uso están <strong>desactivadas hasta que las aceptas</strong>.</li>
+    <li>No vendemos tus datos. Puedes pedir verlos, corregirlos, llevártelos o borrarlos.</li>
+  </ul>
+
+  <h2>1. Responsable</h2>
+  <p>{site.owner}, {site.ownerId}, con domicilio en {site.ownerAddress}, titular de la app Escaque.</p>
+  <p>Contacto para cualquier asunto de privacidad, y punto de contacto ante la Autoridad Nacional de Protección de Datos Personales: <a href={mail}>{site.email}</a>.</p>
+  <p>Banco de datos: «Usuarios de Escaque», {site.dataBankRegistration}.</p>
+
+  <h2>2. Qué datos tratamos, para qué y con qué base</h2>
+  <table>
+    <thead><tr><th>Uso</th><th>Datos</th><th>Finalidad</th><th>Base</th></tr></thead>
+    <tbody>
+      <tr><td>Jugar sin cuenta</td><td>Partidas, historial y ajustes</td><td>Que la app funcione</td><td>No los recibimos: se quedan en tu dispositivo</td></tr>
+      <tr><td>Cuenta</td><td>Correo, identificador de usuario, nombre de usuario y, si entras con Google, el nombre y la foto que Google nos facilita</td><td>Darte acceso y que tus rivales te reconozcan</td><td>Tu consentimiento al crear la cuenta y la prestación del servicio que pides</td></tr>
+      <tr><td>Partidas online</td><td>Jugadas, resultado, fechas, nombres de usuario y código de invitación</td><td>Jugar online y validar cada jugada</td><td>Prestación del servicio</td></tr>
+      <tr><td>Amigos y valoración</td><td>Tus amistades (nombres de usuario), solicitudes y bloqueos; tu valoración por juego; las frases fijas enviadas en las partidas (no hay texto libre)</td><td>Retar a tus amigos, calcular la valoración y publicar la clasificación (solo nombre de usuario y valoración)</td><td>Prestación del servicio que pides; puedes desactivar las solicitudes en Ajustes</td></tr>
+      <tr><td>Avisos</td><td>Token de notificaciones, tus preferencias de avisos y el idioma de la app</td><td>Avisarte cuando te toca</td><td>Tu consentimiento (permiso de notificaciones de Android); lo retiras en Ajustes</td></tr>
+      <tr><td>Anuncios</td><td>Identificador de publicidad, datos técnicos del dispositivo y tu elección de consentimiento</td><td>Mostrar anuncios (personalizados solo si lo aceptas)</td><td>Tu consentimiento en el formulario de privacidad de anuncios</td></tr>
+      <tr><td>Compra «quitar anuncios»</td><td>Identificador de la compra y del pedido de Google Play, ligados a tu cuenta (si tienes una). No recibimos datos de tu tarjeta: el pago lo gestiona Google</td><td>Activar la compra en todos tus teléfonos y retirarla si se reembolsa</td><td>Prestación del servicio que compras</td></tr>
+      <tr><td>Seguridad</td><td>Comprobaciones de integridad de la app</td><td>Evitar trampas y abusos</td><td>Prestación del servicio de forma segura</td></tr>
+      <tr><td>Estadísticas de uso</td><td>Qué juegos y funciones se usan, sin tu nombre, correo ni identificador de cuenta</td><td>Decidir qué mejorar</td><td>Solo con tu consentimiento: <strong>desactivadas hasta que las aceptas</strong></td></tr>
+      <tr><td>Informes de errores</td><td>Datos técnicos de los fallos (modelo y versión del dispositivo y de la app, traza del error), sin identificarte</td><td>Detectar y corregir fallos</td><td>Mantener la app funcionando; puedes desactivarlos en Ajustes → Privacidad</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Origen:</strong> los datos los facilitas tú al usar la app, salvo el nombre y la foto de tu cuenta de Google, si entras con ella. No pedimos tu ubicación, contactos, fotos ni micrófono. No tomamos decisiones automatizadas que te afecten ni elaboramos perfiles.</p>
+  <p>Sin correo no se puede crear una cuenta, pero puedes seguir jugando sin ella.</p>
+
+  <h2>3. Con quién se comparten</h2>
+  <ul>
+    <li><strong>Google</strong> (Google LLC y empresas de su grupo), como proveedor de infraestructura (Firebase y Google Cloud) y de publicidad (AdMob).</li>
+    <li><strong>Tus rivales online</strong> ven tu nombre de usuario.</li>
+    <li>Autoridades, solo cuando la ley lo exija.</li>
+  </ul>
+  <p>No vendemos ni cedemos tus datos para otros fines.</p>
+
+  <h2>4. Transferencias internacionales</h2>
+  <p>Los datos se guardan en servidores de Google Cloud en São Paulo (Brasil). Algunos servicios de Google (autenticación, notificaciones, publicidad, estadísticas) pueden tratarlos en otros países, entre ellos Estados Unidos, con las garantías contractuales que Google ofrece para estas transferencias. Al crear una cuenta y aceptar estos servicios consientes estas transferencias.</p>
+
+  <h2>5. Cuánto tiempo</h2>
+  <ul>
+    <li>Cuenta y partidas online: mientras la cuenta exista.</li>
+    <li>Al eliminar la cuenta: se borran el perfil, los avisos y la reserva del nombre de usuario; en las partidas jugadas tu nombre se sustituye por «Cuenta eliminada».</li>
+    <li>Partidas en espera de rival: se cancelan a los 7 días.</li>
+    <li>Estadísticas de uso: 2 meses. Informes de errores: 90 días.</li>
+  </ul>
+
+  <h2>6. Tus derechos</h2>
+  <p>Puedes ejercer, de forma gratuita, tus derechos de <strong>información, acceso, rectificación, cancelación (supresión), oposición y portabilidad</strong>, y retirar tu consentimiento cuando quieras.</p>
+  <ol>
+    <li>Escribe a <a href={mail}>{site.email}</a> desde el correo de tu cuenta, indicando qué derecho ejerces y tu nombre de usuario.</li>
+    <li>Si no escribes desde el correo de la cuenta, te pediremos verificar tu identidad.</li>
+    <li>Responderemos dentro de los plazos que fija el Reglamento (por ejemplo, 10 días para la oposición). Para la portabilidad te enviaremos tus datos en un formato estructurado (JSON).</li>
+  </ol>
+  <p>Algunos derechos también los ejerces directamente en la app: cambiar el nombre de usuario, desactivar avisos, estadísticas e informes de errores, cambiar el consentimiento de anuncios y <a href="/eliminar-cuenta">eliminar la cuenta</a>.</p>
+  <p>Si no quedas satisfecho, puedes reclamar ante la <strong>Autoridad Nacional de Protección de Datos Personales</strong> del Ministerio de Justicia y Derechos Humanos del Perú y, si vives en la Unión Europea, ante la autoridad de protección de datos de tu país.</p>
+
+  <h2>7. Menores de edad</h2>
+  <p>Para crear una cuenta debes tener al menos <strong>14 años</strong>. Si tienes menos, necesitas el consentimiento de tu madre, padre o tutor. Si sabemos que una cuenta pertenece a un menor de 14 años sin ese consentimiento, la eliminaremos.</p>
+
+  <h2>8. Seguridad</h2>
+  <p>Las comunicaciones van cifradas, el acceso a los datos está limitado a cuentas de servicio con los permisos mínimos y cada jugada se valida en el servidor. Si ocurriera un incidente de seguridad que afecte a tus datos, lo comunicaremos a la Autoridad y a las personas afectadas según exige la normativa.</p>
+
+  <h2>9. Cambios</h2>
+  <p>Publicaremos aquí cualquier cambio y, si es importante, te avisaremos en la app antes de que se aplique.</p>
+</Legal>

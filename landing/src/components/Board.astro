@@ -1,0 +1,44 @@
+---
+/**
+ * Tablero ilustrativo con piezas propias: una posición de la Apertura
+ * Italiana tras 3.Ac4, con el último movimiento y los destinos marcados.
+ */
+import Piece from './Piece.astro';
+type P = ['king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn', boolean];
+const pos: Record<string, P> = {
+  a8: ['rook', false], c8: ['bishop', false], d8: ['queen', false], e8: ['king', false], f8: ['bishop', false], g8: ['knight', false], h8: ['rook', false],
+  a7: ['pawn', false], b7: ['pawn', false], c7: ['pawn', false], d7: ['pawn', false], f7: ['pawn', false], g7: ['pawn', false], h7: ['pawn', false],
+  c6: ['knight', false], e5: ['pawn', false],
+  c4: ['bishop', true], e4: ['pawn', true], f3: ['knight', true],
+  a2: ['pawn', true], b2: ['pawn', true], c2: ['pawn', true], d2: ['pawn', true], f2: ['pawn', true], g2: ['pawn', true], h2: ['pawn', true],
+  a1: ['rook', true], b1: ['knight', true], c1: ['bishop', true], d1: ['queen', true], e1: ['king', true], h1: ['rook', true],
+};
+const last = new Set(['f1', 'c4']);
+const files = 'abcdefgh';
+const squares = [];
+for (let r = 8; r >= 1; r--) for (let f = 0; f < 8; f++) squares.push({ id: `${files[f]}${r}`, dark: (f + r) % 2 === 1 });
+---
+<div class="board" role="img" aria-label="Tablero de ajedrez de Escaque con piezas propias">
+  {squares.map((s) => (
+    <div class:list={['sq', s.dark ? 'dark' : 'light', last.has(s.id) && 'last']}>
+      {pos[s.id] && <Piece name={pos[s.id][0]} white={pos[s.id][1]} size="100%" />}
+    </div>
+  ))}
+</div>
+<style>
+  .board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    aspect-ratio: 1;
+    width: 100%;
+    border: clamp(6px, 1.6vw, 12px) solid var(--board-frame);
+    border-radius: 4px;
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.55);
+  }
+  .sq { position: relative; display: grid; place-items: center; }
+  .light { background: var(--board-light); }
+  .dark { background: var(--board-dark); }
+  .last::after { content: ''; position: absolute; inset: 0; background: var(--last-move); }
+  .sq :global(.piece) { width: 92%; height: 92%; position: relative; z-index: 1; display: block; }
+  .sq :global(.piece svg) { width: 100%; height: 100%; display: block; }
+</style>

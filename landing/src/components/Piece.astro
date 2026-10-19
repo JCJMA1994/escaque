@@ -1,0 +1,13 @@
+---
+/** Piezas de ajedrez propias de Escaque. */
+interface Props {
+  name: 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
+  white?: boolean;
+  size?: number | string;
+}
+const { name, white = true, size = 48 } = Astro.props;
+const all = import.meta.glob<string>('../pieces/*.svg', { query: '?raw', import: 'default', eager: true });
+const raw = all[`../pieces/${name}-${white ? 'w' : 'b'}.svg`];
+const svg = raw.replace('<svg ', `<svg width="${size}" height="${size}" aria-hidden="true" focusable="false" `);
+---
+<span class="piece" set:html={svg} />

@@ -1,0 +1,10 @@
+# Cloud Build solo necesita el motor y el servidor.
+.git/
+.github/
+landing/
+tablero_app/
+firebase/
+**/.dart_tool/
+**/build/
+**/node_modules/
+*.md

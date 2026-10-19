@@ -1,0 +1,79 @@
+---
+import Legal from '../../layouts/Legal.astro';
+import { site } from '../../site';
+const mail = `mailto:${site.email}`;
+---
+<Legal lang="en" title="Privacy policy" description="What data Escaque processes, why, on what basis, and how to exercise your rights.">
+  <p class="note"><strong>Draft to be reviewed by a legal adviser before publishing.</strong> Written in line with Peru’s Personal Data Protection Law No. 29733 and its Regulation (Supreme Decree No. 016-2024-JUS), taking the GDPR into account for users in the European Union. Fill in the data in brackets.</p>
+  <p class="muted">Last updated: {site.updatedEn}</p>
+
+  <h2>Summary</h2>
+  <ul>
+    <li>Playing without an account collects no personal data: your games stay on your phone.</li>
+    <li>An account (email and username) is only needed to play online.</li>
+    <li>Usage statistics are <strong>off until you accept them</strong>.</li>
+    <li>We don’t sell your data. You can ask to see, correct, take or delete it.</li>
+  </ul>
+
+  <h2>1. Controller</h2>
+  <p>{site.owner}, {site.ownerId}, at {site.ownerAddress}, owner of the Escaque app.</p>
+  <p>Contact for any privacy matter, and contact point for Peru’s National Personal Data Protection Authority: <a href={mail}>{site.email}</a>.</p>
+  <p>Data bank: “Usuarios de Escaque”, {site.dataBankRegistration}.</p>
+
+  <h2>2. What data we process, why and on what basis</h2>
+  <table>
+    <thead><tr><th>Use</th><th>Data</th><th>Purpose</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td>Playing without an account</td><td>Games, history and settings</td><td>Making the app work</td><td>We don’t receive them: they stay on your device</td></tr>
+      <tr><td>Account</td><td>Email, user ID, username and, if you sign in with Google, the name and photo Google provides</td><td>Giving you access and letting opponents recognise you</td><td>Your consent when you create the account and providing the service you request</td></tr>
+      <tr><td>Online games</td><td>Moves, result, dates, usernames and invite code</td><td>Playing online and validating every move</td><td>Providing the service</td></tr>
+      <tr><td>Friends and rating</td><td>Your friendships (usernames), requests and blocks; your rating per game; the fixed phrases sent in games (there is no free text)</td><td>Challenging your friends, calculating ratings and publishing the leaderboard (username and rating only)</td><td>Providing the service you request; you can turn off requests in Settings</td></tr>
+      <tr><td>Notifications</td><td>Notification token, your notification preferences and app language</td><td>Telling you when it’s your turn</td><td>Your consent (Android notification permission); withdraw it in Settings</td></tr>
+      <tr><td>Ads</td><td>Advertising ID, technical device data and your consent choice</td><td>Showing ads (personalised only if you accept)</td><td>Your consent in the ad privacy form</td></tr>
+      <tr><td>“Remove ads” purchase</td><td>Google Play purchase and order identifiers, linked to your account (if you have one). We never receive your card details: Google handles the payment</td><td>Enabling the purchase on all your phones and withdrawing it if refunded</td><td>Providing the service you buy</td></tr>
+      <tr><td>Security</td><td>App integrity checks</td><td>Preventing cheating and abuse</td><td>Providing the service securely</td></tr>
+      <tr><td>Usage statistics</td><td>Which games and features are used, without your name, email or account ID</td><td>Deciding what to improve</td><td>Only with your consent: <strong>off until you accept them</strong></td></tr>
+      <tr><td>Crash reports</td><td>Technical crash data (device and app model and version, error trace), without identifying you</td><td>Detecting and fixing crashes</td><td>Keeping the app working; you can turn them off in Settings → Privacy</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Source:</strong> you provide the data when using the app, except your Google account name and photo, if you sign in with Google. We don’t ask for your location, contacts, photos or microphone. We make no automated decisions affecting you and build no profiles.</p>
+  <p>Without an email you can’t create an account, but you can keep playing without one.</p>
+
+  <h2>3. Who we share it with</h2>
+  <ul>
+    <li><strong>Google</strong> (Google LLC and its group companies), as infrastructure provider (Firebase and Google Cloud) and advertising provider (AdMob).</li>
+    <li><strong>Your online opponents</strong> see your username.</li>
+    <li>Authorities, only when the law requires it.</li>
+  </ul>
+  <p>We don’t sell or hand over your data for other purposes.</p>
+
+  <h2>4. International transfers</h2>
+  <p>Data is stored on Google Cloud servers in São Paulo (Brazil). Some Google services (authentication, notifications, advertising, statistics) may process it in other countries, including the United States, with the contractual safeguards Google provides for these transfers. By creating an account and accepting these services you consent to these transfers.</p>
+
+  <h2>5. How long</h2>
+  <ul>
+    <li>Account and online games: as long as the account exists.</li>
+    <li>When you delete your account: your profile, notifications and username reservation are deleted; in past games your name is replaced by “Deleted account”.</li>
+    <li>Games waiting for an opponent: cancelled after 7 days.</li>
+    <li>Usage statistics: 2 months. Crash reports: 90 days.</li>
+  </ul>
+
+  <h2>6. Your rights</h2>
+  <p>You can exercise, free of charge, your rights of <strong>information, access, rectification, erasure, objection and portability</strong>, and withdraw your consent at any time.</p>
+  <ol>
+    <li>Write to <a href={mail}>{site.email}</a> from your account’s email, saying which right you are exercising and your username.</li>
+    <li>If you don’t write from your account’s email, we will ask you to verify your identity.</li>
+    <li>We will reply within the time limits set by the Regulation (for example, 10 days for objections). For portability we will send your data in a structured format (JSON).</li>
+  </ol>
+  <p>You can also exercise some rights directly in the app: change your username, turn off notifications, statistics and crash reports, change ad consent and <a href="/en/delete-account">delete your account</a>.</p>
+  <p>If you are not satisfied, you can complain to Peru’s <strong>National Personal Data Protection Authority</strong> (Ministry of Justice and Human Rights) and, if you live in the European Union, to your country’s data protection authority.</p>
+
+  <h2>7. Minors</h2>
+  <p>You must be at least <strong>14 years old</strong> to create an account. If you are younger, you need consent from your parent or guardian. If we learn that an account belongs to someone under 14 without that consent, we will delete it.</p>
+
+  <h2>8. Security</h2>
+  <p>Communications are encrypted, data access is limited to service accounts with minimum permissions and every move is validated on the server. If a security incident affected your data, we would notify the Authority and the people affected as the law requires.</p>
+
+  <h2>9. Changes</h2>
+  <p>We will publish any change here and, if it is important, let you know in the app before it applies.</p>
+</Legal>

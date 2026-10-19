@@ -1,0 +1,30 @@
+# Firebase
+.firebase/
+.firebaserc.local
+firebase-debug.log
+firestore-debug.log
+
+# Secretos y configuración local
+**/key.properties
+**/*.jks
+**/*.keystore
+tablero_app/config/*.json
+!tablero_app/config/*.example
+variables.sh
+
+# Dart / Flutter
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# Node
+landing/node_modules/
+landing/dist/
+landing/.astro/
+
+.DS_Store
+
+# Copias de tool/bootstrap_android.py
+**/*.orig
+landing/public/puzzles/

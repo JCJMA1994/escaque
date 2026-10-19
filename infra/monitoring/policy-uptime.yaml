@@ -1,0 +1,17 @@
+displayName: "Escaque API (__ENV__): /healthz no responde"
+combiner: OR
+severity: CRITICAL
+conditions:
+  - displayName: "Comprobación de disponibilidad fallida"
+    conditionPrometheusQueryLanguage:
+      query: |
+        avg by (check_id) (
+          avg_over_time(monitoring_googleapis_com:uptime_check_check_passed{monitored_resource="uptime_url",check_id="__UPTIME_ID__"}[2m])
+        ) < 0.5
+      duration: 120s
+      evaluationInterval: 60s
+documentation:
+  mimeType: text/markdown
+  content: |
+    `/healthz` falla desde varias regiones. Comprueba Cloud Run, el dominio en Firebase Hosting y el DNS.
+notificationChannels: ["__CHANNEL__"]

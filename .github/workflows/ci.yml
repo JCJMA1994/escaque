@@ -1,0 +1,110 @@
+# Integración continua: cada push y cada pull request. Nada se despliega aquí.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+  pull_request:
+  workflow_call:   # deploy.yml lo reutiliza antes de desplegar
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Flutter 3.47 apunta a Android 16 (API 36), obligatorio en Google Play
+  # desde el 31/08/2026. Motor y servidor usan el Dart que trae este Flutter.
+  FLUTTER_VERSION: '3.47.7'
+  NODE_VERSION: '22'
+
+jobs:
+  engine:
+    name: Motor (Dart)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: tablero_engine } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: '${{ env.FLUTTER_VERSION }}', cache: true }
+      - run: dart pub get
+      - run: dart analyze
+      - run: dart test --reporter expanded
+
+  server:
+    name: Servidor (Dart)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: tablero_server } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: '${{ env.FLUTTER_VERSION }}', cache: true }
+      - run: dart pub get
+      - run: dart analyze
+      - run: dart test --reporter expanded
+
+  app:
+    name: App (Flutter)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: tablero_app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      # Las sugerencias (infos) no rompen el CI; avisos y errores sí.
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test
+
+  landing:
+    name: Landing (Astro)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: landing } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  rules:
+    name: Reglas de Firestore (emulador)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: firebase/tests/package-lock.json
+      - run: npm ci --prefix firebase/tests
+      - run: >
+          npx --yes firebase-tools@15.32.1 emulators:exec --only firestore --project demo-escaque
+          "npm test --prefix firebase/tests"
+
+  config:
+    name: Configuración y verificación estática
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pyyaml
+      - run: pip install tree-sitter-language-pack
+      - run: python3 tool/verify_repo.py
+      - run: python3 tool/audit_wiring.py
+      - name: JSON válidos
+        run: |
+          python3 -m json.tool firebase.json > /dev/null
+          python3 -m json.tool firebase/firestore.indexes.json > /dev/null
+          python3 -m json.tool .firebaserc.example > /dev/null
+          if [ -f .firebaserc ]; then python3 -m json.tool .firebaserc > /dev/null; fi

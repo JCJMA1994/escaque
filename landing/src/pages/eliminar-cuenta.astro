@@ -1,0 +1,33 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { site } from '../site';
+const subject = encodeURIComponent('Eliminar mi cuenta de Escaque');
+const body = encodeURIComponent('Hola:\n\nQuiero eliminar mi cuenta de Escaque.\n\nNombre de usuario: @\nCorreo de la cuenta: \n');
+---
+<Legal title="Eliminar tu cuenta de Escaque" description="Cómo eliminar tu cuenta de Escaque y qué datos se borran.">
+  <h2>Desde la app (inmediato)</h2>
+  <ol>
+    <li>Abre Escaque y ve a <strong>Ajustes → Cuenta</strong>.</li>
+    <li>Toca <strong>Eliminar cuenta</strong> y confirma. Puede que te pidamos tu contraseña o volver a entrar con Google.</li>
+  </ol>
+
+  <h2>Sin la app</h2>
+  <p>Escríbenos desde el correo de tu cuenta:</p>
+  <p><a class="btn btn-primary" href={`mailto:${site.email}?subject=${subject}&body=${body}`}>Solicitar la eliminación por correo</a></p>
+  <p class="muted">Para proteger tu cuenta, solo atendemos solicitudes enviadas desde el correo con el que te registraste. La completaremos en un plazo máximo de 30 días y te lo confirmaremos por correo.</p>
+
+  <h2>Qué se borra</h2>
+  <ul>
+    <li>Tu cuenta de acceso (correo y método de inicio de sesión).</li>
+    <li>Tu perfil, tus preferencias de avisos y los tokens de notificación de tus dispositivos.</li>
+    <li>Tu nombre de usuario, que queda libre para otra persona.</li>
+    <li>Tus amistades, solicitudes y bloqueos, y tu valoración (sales de las clasificaciones en su siguiente actualización).</li>
+  </ul>
+  <h2>Qué pasa con tus partidas</h2>
+  <ul>
+    <li>Las partidas online en curso terminan y gana tu rival.</li>
+    <li>Las que esperaban rival se cancelan.</li>
+    <li>En las partidas ya jugadas, tu nombre se sustituye por «Cuenta eliminada» para que tus rivales conserven su historial.</li>
+    <li>Las partidas guardadas en tu teléfono sin cuenta no las tenemos: siguen en tu dispositivo hasta que desinstales la app.</li>
+  </ul>
+</Legal>

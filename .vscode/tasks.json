@@ -1,0 +1,69 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "App: Flutter Analyze",
+      "type": "shell",
+      "command": "flutter analyze --no-pub",
+      "options": {
+        "cwd": "${workspaceFolder}/tablero_app"
+      },
+      "problemMatcher": "$dart-analyze"
+    },
+    {
+      "label": "Server: Dart Analyze",
+      "type": "shell",
+      "command": "dart analyze",
+      "options": {
+        "cwd": "${workspaceFolder}/tablero_server"
+      },
+      "problemMatcher": "$dart-analyze"
+    },
+    {
+      "label": "Engine: Dart Analyze",
+      "type": "shell",
+      "command": "dart analyze",
+      "options": {
+        "cwd": "${workspaceFolder}/tablero_engine"
+      },
+      "problemMatcher": "$dart-analyze"
+    },
+    {
+      "label": "Landing: Servidor de desarrollo (Astro Dev)",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/landing"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Landing: Compilar web (Astro Build)",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/landing"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tool: Verificar Monorepo (verify_repo.py)",
+      "type": "shell",
+      "command": "python tool/verify_repo.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tool: Auditar Conexiones (audit_wiring.py)",
+      "type": "shell",
+      "command": "python tool/audit_wiring.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
