@@ -14,6 +14,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    buildFeatures {
+        resValues = true
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.tablero_app"
@@ -27,6 +31,24 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    flavorDimensions += "env"
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "Escaque DEV")
+        }
+        create("qa") {
+            dimension = "env"
+            applicationIdSuffix = ".qa"
+            resValue("string", "app_name", "Escaque QA")
+        }
+        create("prod") {
+            dimension = "env"
+            resValue("string", "app_name", "Escaque")
+        }
     }
 
     buildTypes {
