@@ -38,7 +38,14 @@ class PieceComponent extends PositionComponent {
       final kind = PieceKind.values.byName(view.glyph!);
       final px = (size.x * pixelRatio).ceil().clamp(16, 512);
       _sprite = await PieceArt.image(kind, white: _white, colors: colors, px: px);
+      findGame()?.resumeEngine();
     }
+  }
+
+  @override
+  void onMount() {
+    super.onMount();
+    findGame()?.resumeEngine();
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import '../account/auth_screen.dart';
@@ -55,7 +56,7 @@ final appRouter = GoRouter(
       builder: (context, state) =>
           NewGameScreen(kind: GameKind.values.byName(state.pathParameters['kind']!)),
     ),
-    GoRoute(path: '/game', builder: (context, state) => const GameScreen()),
+    GoRoute(path: '/game', builder: (context, state) => GameScreen(key: UniqueKey())),
     GoRoute(
       path: '/j/:code',
       builder: (context, state) => JoinInviteScreen(code: state.pathParameters['code'] ?? ''),
@@ -68,13 +69,17 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/learn/:id',
-      builder: (context, state) => LessonScreen(lessonId: state.pathParameters['id'] ?? ''),
+      builder: (context, state) => LessonScreen(
+        key: ValueKey(state.pathParameters['id']),
+        lessonId: state.pathParameters['id'] ?? '',
+      ),
     ),
     GoRoute(path: '/remove-ads', builder: (context, state) => const RemoveAdsScreen()),
     GoRoute(path: '/puzzles', builder: (context, state) => const PuzzleListScreen()),
     GoRoute(
       path: '/puzzles/:id',
       builder: (context, state) => PuzzleScreen(
+        key: ValueKey('${state.pathParameters['id']}_${state.uri.queryParameters['daily']}'),
         puzzleId: int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
         daily: state.uri.queryParameters['daily'] == '1',
       ),

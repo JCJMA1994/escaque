@@ -57,6 +57,13 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> {
     } else {
       _game!.updateColors(colors);
     }
+    if (_puzzle != null) _game!.sync(_view());
+  }
+
+  @override
+  void dispose() {
+    _game = null;
+    super.dispose();
   }
 
   /// Se llama desde build: prepara el estado sin setState.
@@ -64,7 +71,7 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> {
     if (_puzzle?.id == p.id) return;
     _puzzle = p;
     _reset();
-    _syncBoard();
+    if (_game != null) _game!.sync(_view());
   }
 
   void _reset() {
@@ -110,18 +117,14 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> {
     );
   }
 
-  /// El tablero se actualiza tras el fotograma (ya tiene tamaño).
   void _syncBoard() {
-    final v = _view();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _game?.sync(v);
-    });
+    if (mounted && _puzzle != null) {
+      _game?.sync(_view());
+      setState(() {});
+    }
   }
 
-  void _sync() {
-    _syncBoard();
-    if (mounted) setState(() {});
-  }
+  void _sync() => _syncBoard();
 
   void _tap(int cell) {
     if (_phase != _Phase.solving || _adapter.toMove != _puzzle!.sideToMove) return;
@@ -314,6 +317,12 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> {
           data: (list) {
             final puzzle = list.firstWhere((p) => p.id == widget.puzzleId, orElse: () => list.first);
             _load(puzzle);
+            final settings = ref.watch(settingsProvider);
+            _game
+              ?..reduceMotion = MediaQuery.disableAnimationsOf(context)
+              ..showCoordinates = settings.showCoordinates
+              ..updateColors(c.withBoard(settings.boardTheme))
+              ..sync(_view());
             final index = list.indexOf(puzzle);
             final next = list[(index + 1) % list.length];
             final banner = switch (_phase) {
@@ -356,7 +365,10 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> {
                           aspectRatio: 1,
                           child: Semantics(
                             label: tr('Tablero del problema'),
-                            child: GameWidget(game: _game!),
+                            child: GameWidget(
+                              key: ValueKey(_game),
+                              game: _game!,
+                            ),
                           ),
                         ),
                       ),

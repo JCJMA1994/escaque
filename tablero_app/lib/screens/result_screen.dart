@@ -12,6 +12,7 @@ import 'online_game_loader.dart';
 import '../app/theme.dart';
 import '../data/game_store.dart';
 import '../match/match_config.dart';
+import '../match/match_controller.dart';
 import '../ui/layout.dart';
 import '../l10n/l10n.dart';
 
@@ -98,6 +99,11 @@ class ResultScreen extends ConsumerWidget {
                 child: FilledButton(
                   onPressed: () => thenGo(() async {
                     if (!cfg.isOnline) {
+                      final nextSeat = cfg.opponent == Opponent.local ? 0 : 1 - cfg.humanSeat;
+                      ref.read(resumeGameProvider.notifier).state = null;
+                      ref.read(matchConfigProvider.notifier).state = cfg.copyWith(
+                        humanSeat: nextSeat,
+                      );
                       context.pushReplacement('/game');
                       return;
                     }

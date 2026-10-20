@@ -68,11 +68,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     if (json != null && mounted) setState(() => _analysis = GameAnalysis.fromJson(json));
   }
 
-  @override
-  void dispose() {
-    _job?.cancel(); // salir de la pantalla también lo detiene
-    super.dispose();
-  }
 
   Future<void> _analyse() async {
     setState(() => _progress = 0);
@@ -151,10 +146,17 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final colors = TableroColors.of(context).withBoard(ref.read(settingsProvider).boardTheme);
     if (_game == null) {
       _game = BoardGame(colors: colors, onCellTap: (_) {})..dragEnabled = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _sync());
     } else {
       _game!.updateColors(colors);
     }
+    _sync();
+  }
+
+  @override
+  void dispose() {
+    _job?.cancel(); // salir de la pantalla también lo detiene
+    _game = null;
+    super.dispose();
   }
 
   List<String> get _log {
@@ -195,6 +197,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   Widget build(BuildContext context) {
     final c = TableroColors.of(context);
     _game?.showCoordinates = ref.watch(settingsProvider).showCoordinates;
+    _sync();
     final last = _snapshots.length - 1;
     final canExport = _cfg.kind != GameKind.chineseCheckers;
     return Scaffold(
@@ -235,7 +238,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   children: [
                     Expanded(
                       child: Center(
-                        child: AspectRatio(aspectRatio: 1, child: GameWidget(game: _game!)),
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: GameWidget(
+                            key: ValueKey(_game),
+                            game: _game!,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),

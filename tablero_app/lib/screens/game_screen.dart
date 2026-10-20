@@ -43,17 +43,22 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final colors = TableroColors.of(context);
+    final boardColors = _boardColors(colors, ref.read(settingsProvider).boardTheme);
     if (_game == null) {
       _game = BoardGame(
-        colors: _boardColors(colors, ref.read(settingsProvider).boardTheme),
+        colors: boardColors,
         onCellTap: (cell) => ref.read(matchProvider.notifier).tapCell(cell),
       );
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _game!.sync(ref.read(matchProvider));
-      });
     } else {
-      _game!.updateColors(_boardColors(colors, ref.read(settingsProvider).boardTheme));
+      _game!.updateColors(boardColors);
     }
+    _game!.sync(ref.read(matchProvider));
+  }
+
+  @override
+  void dispose() {
+    _game = null;
+    super.dispose();
   }
 
   TableroColors? _lastBase;
@@ -422,7 +427,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ?..showCoordinates = settings.showCoordinates
       ..dragEnabled = settings.dragPieces
       ..reduceMotion = MediaQuery.disableAnimationsOf(context)
-      ..updateColors(_boardColors(c, settings.boardTheme));
+      ..updateColors(_boardColors(c, settings.boardTheme))
+      ..sync(v);
     final log = v.config.kind == GameKind.chess && settings.spanishNotation
         ? [for (final m in v.moveLog) spanishSan(m)]
         : v.moveLog;
@@ -478,7 +484,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       aspectRatio: 1,
       child: Semantics(
         label: tr('Tablero de {p0}', {'p0': cfg.title.toLowerCase()}),
-        child: GameWidget(game: _game!),
+        child: GameWidget(
+          key: ValueKey(_game),
+          game: _game!,
+        ),
       ),
     );
 

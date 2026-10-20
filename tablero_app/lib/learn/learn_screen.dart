@@ -132,10 +132,16 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     final colors = TableroColors.of(context).withBoard(ref.read(settingsProvider).boardTheme);
     if (_game == null) {
       _game = BoardGame(colors: colors, onCellTap: _tap)..dragEnabled = true;
-      _syncBoard();
     } else {
       _game!.updateColors(colors);
     }
+    _game!.sync(_view());
+  }
+
+  @override
+  void dispose() {
+    _game = null;
+    super.dispose();
   }
 
   void _reset() {
@@ -180,16 +186,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   }
 
   void _syncBoard() {
-    final v = _view();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _game?.sync(v);
-    });
+    if (mounted) {
+      _game?.sync(_view());
+      setState(() {});
+    }
   }
 
-  void _sync() {
-    _syncBoard();
-    if (mounted) setState(() {});
-  }
+  void _sync() => _syncBoard();
 
   void _tap(int cell) {
     if (_done) return;
@@ -259,7 +262,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   @override
   Widget build(BuildContext context) {
     final c = TableroColors.of(context);
-    _game?.reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final settings = ref.watch(settingsProvider);
+    _game
+      ?..reduceMotion = MediaQuery.disableAnimationsOf(context)
+      ..showCoordinates = settings.showCoordinates
+      ..dragEnabled = true
+      ..updateColors(c.withBoard(settings.boardTheme))
+      ..sync(_view());
     final (bg, fg, text) = _done
         ? (c.brand, c.brandInk, tr(_lesson.done))
         : _wrong
@@ -304,7 +313,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                   child: Center(
                     child: AspectRatio(
                       aspectRatio: 1,
-                      child: Semantics(label: tr('Tablero de la lección'), child: GameWidget(game: _game!)),
+                      child: Semantics(
+                        label: tr('Tablero de la lección'),
+                        child: GameWidget(
+                          key: ValueKey(_game),
+                          game: _game!,
+                        ),
+                      ),
                     ),
                   ),
                 ),

@@ -7,6 +7,7 @@ import 'package:tablero_engine/tablero_engine.dart';
 
 import '../app/settings.dart';
 import '../app/theme.dart';
+import '../data/game_store.dart';
 import '../match/match_config.dart';
 import '../match/match_controller.dart';
 import '../widgets/segmented.dart';
@@ -48,6 +49,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
       _Side.black => 1,
       _Side.random => Random().nextInt(2),
     };
+    ref.read(resumeGameProvider.notifier).state = null;
     ref.read(matchConfigProvider.notifier).state = MatchConfig(
       kind: widget.kind,
       draughtsVariant: _variant,

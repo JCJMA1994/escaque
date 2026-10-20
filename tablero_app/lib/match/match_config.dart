@@ -13,6 +13,17 @@ class TimeControl {
   String get label => '$minutes + $incrementSeconds';
 
   static const presets = [TimeControl(5, 0), TimeControl(10, 5), TimeControl(15, 10)];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TimeControl &&
+          runtimeType == other.runtimeType &&
+          minutes == other.minutes &&
+          incrementSeconds == other.incrementSeconds;
+
+  @override
+  int get hashCode => Object.hash(minutes, incrementSeconds);
 }
 
 /// Configuración elegida en «Nueva partida».
@@ -138,5 +149,31 @@ class MatchConfig {
         clock: clock,
         players: players,
         onlineGameId: onlineGameId,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MatchConfig &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          draughtsVariant.id == other.draughtsVariant.id &&
+          opponent == other.opponent &&
+          aiLevel == other.aiLevel &&
+          humanSeat == other.humanSeat &&
+          clock == other.clock &&
+          players == other.players &&
+          onlineGameId == other.onlineGameId;
+
+  @override
+  int get hashCode => Object.hash(
+        kind,
+        draughtsVariant.id,
+        opponent,
+        aiLevel,
+        humanSeat,
+        clock,
+        players,
+        onlineGameId,
       );
 }

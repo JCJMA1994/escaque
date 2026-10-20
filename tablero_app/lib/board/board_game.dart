@@ -44,7 +44,6 @@ class BoardGame extends FlameGame {
   final _pieces = <int, PieceComponent>{};
   int _shownVersion = -1;
   bool _animating = false;
-  int _idleFrames = 0;
 
   // Arrastre en curso.
   PieceComponent? _dragging;
@@ -64,12 +63,38 @@ class BoardGame extends FlameGame {
     if (v != null) _install(v);
   }
 
+  @override
+  void onMount() {
+    super.onMount();
+    final v = _view;
+    if (v != null && _board == null) _install(v);
+    _wake();
+  }
+
+  @override
+  void onRemove() {
+    _board?.removeFromParent();
+    _board = null;
+    for (final p in world.children.whereType<PieceComponent>().toList()) {
+      p.removeFromParent();
+    }
+    _pieces.clear();
+    super.onRemove();
+  }
+
   /// Recibe cada estado nuevo de la partida.
   void sync(MatchView v) {
     final prev = _view;
     _view = v;
     if (!isLoaded) return;
-    if (_board == null || prev == null || prev.flipped != v.flipped || prev.board.shape != v.board.shape) {
+    final isNewGame = prev == null ||
+        _board == null ||
+        prev.config != v.config ||
+        prev.flipped != v.flipped ||
+        prev.board.shape != v.board.shape ||
+        prev.board.size != v.board.size ||
+        (v.board.version == 0 && prev.board.version > 0);
+    if (isNewGame) {
       _install(v);
       return;
     }
@@ -127,7 +152,7 @@ class BoardGame extends FlameGame {
   }
 
   void _rebuild(BoardSnapshot b) {
-    for (final p in _pieces.values) {
+    for (final p in world.children.whereType<PieceComponent>().toList()) {
       p.removeFromParent();
     }
     _pieces.clear();
@@ -145,6 +170,7 @@ class BoardGame extends FlameGame {
       world.add(c);
     }
     _shownVersion = b.version;
+    _wake();
   }
 
   void _animate(BoardSnapshot b) {
@@ -156,6 +182,20 @@ class BoardGame extends FlameGame {
     }
     _animating = true;
     mover.priority = 10;
+
+    // Desvanecer inmediatamente las piezas capturadas para que no queden
+    // congeladas debajo de la pieza atacante.
+    for (final cell in b.lastCaptured) {
+      final victim = _pieces.remove(cell);
+      if (victim != null) {
+        victim.add(ScaleEffect.to(
+          Vector2.zero(),
+          EffectController(duration: 0.18, curve: Curves.easeIn),
+          onComplete: victim.removeFromParent,
+        ));
+      }
+    }
+
     final hops = <Effect>[
       for (final cell in b.lastPath.skip(1))
         MoveEffect.to(
@@ -164,18 +204,8 @@ class BoardGame extends FlameGame {
         ),
     ];
     mover.add(SequenceEffect(hops, onComplete: () {
-      for (final cell in b.lastCaptured) {
-        final victim = _pieces.remove(cell);
-        if (victim != null) {
-          victim.add(ScaleEffect.to(
-            Vector2.zero(),
-            EffectController(duration: 0.2),
-            onComplete: victim.removeFromParent,
-          ));
-        }
-      }
       world.add(TimerComponent(
-        period: b.lastCaptured.isEmpty ? 0.02 : 0.22,
+        period: 0.05,
         removeOnFinish: true,
         onTick: () => _finishAnimation(b),
       ));
@@ -246,18 +276,6 @@ class BoardGame extends FlameGame {
   }
 
   void _wake() {
-    _idleFrames = 0;
     if (paused) resumeEngine();
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    // Un juego por turnos no necesita 60 fps continuos: se duerme en reposo.
-    if (_animating) {
-      _idleFrames = 0;
-    } else if (++_idleFrames > 4) {
-      pauseEngine();
-    }
   }
 }

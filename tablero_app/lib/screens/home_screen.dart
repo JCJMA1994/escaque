@@ -12,6 +12,7 @@ import '../data/game_store.dart';
 import '../match/match_config.dart';
 import '../match/match_controller.dart';
 import '../ui/app_icon.dart';
+import '../ui/escaque_nav_bar.dart';
 import '../ui/layout.dart';
 import '../puzzles/puzzle_list_screen.dart';
 import '../ui/piece_art.dart';
@@ -80,19 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const BannerSlot(),
-          NavigationBar(
-            backgroundColor: c.surface,
-            indicatorColor: c.surfaceRaised,
+          EscaqueNavBar(
             selectedIndex: _tab,
             onDestinationSelected: (i) => setState(() => _tab = i),
-            destinations: [
-              for (final (icon, label) in _destinations)
-                NavigationDestination(
-                  icon: AppIcon(icon, color: c.inkMuted),
-                  selectedIcon: AppIcon(icon, color: c.brand),
-                  label: tr(label),
-                ),
-            ],
+            destinations: _destinations,
           ),
         ],
       ),
